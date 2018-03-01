@@ -34,7 +34,7 @@ Using the context menu on the main page:
 
 5. Enjoy full featured debugging of JavaFX WebView!
 
-   ![main-screen](assets/images/main-screen.png)
+![main-screen](https://raw.githubusercontent.com/vsch/WebViewDebugSample/master/assets/images/main-screen.png)
 
 ## Available on Maven 
 
@@ -50,5 +50,5 @@ Using the context menu on the main page:
 [Web View Debug Sample ]: https://github.com/vsch/WebViewDebugSample
 [JavaFx WebView Debugger]: https://github.com/vsch/Javafx-WebView-Debugger
 [Markdown Navigator]: http://vladsch.com/product/markdown-navigator 
-[WebViewDebugSample.jar]: WebViewDebugSample.jar
+[WebViewDebugSample.jar]: https://github.com/vsch/WebViewDebugSample/raw/master/WebViewDebugSample.jar
 
