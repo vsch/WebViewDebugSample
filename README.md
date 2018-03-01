@@ -34,6 +34,7 @@ Using the context menu on the main page:
    ![main-screen](assets/images/main-screen.png)
 
 [Javafx Web View Debugger Readme]: https://github.com/vsch/Javafx-WebView-Debugger/blob/master/README.md
+[Web View Debug Sample ]: https://github.com/vsch/WebViewDebugSample
 [JavaFx WebView Debugger]: https://github.com/vsch/Javafx-WebView-Debugger
 [Markdown Navigator]: http://vladsch.com/product/markdown-navigator 
 [WebViewDebugSample.jar]: WebViewDebugSample.jar
