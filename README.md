@@ -47,7 +47,7 @@ Using the context menu on the main page:
 ```
 
 [Javafx Web View Debugger Readme]: https://github.com/vsch/Javafx-WebView-Debugger/blob/master/README.md
-[Web View Debug Sample ]: https://github.com/vsch/WebViewDebugSample
+[Web View Debug Sample]: https://github.com/vsch/WebViewDebugSample
 [JavaFx WebView Debugger]: https://github.com/vsch/Javafx-WebView-Debugger
 [Markdown Navigator]: http://vladsch.com/product/markdown-navigator 
 [WebViewDebugSample.jar]: https://github.com/vsch/WebViewDebugSample/raw/master/WebViewDebugSample.jar
