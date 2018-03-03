@@ -36,6 +36,19 @@ Using the context menu on the main page:
 
 ![main-screen](https://raw.githubusercontent.com/vsch/WebViewDebugSample/master/assets/images/main-screen.png)
 
+### Context Menu Actions
+
+* `Reload Pag `: reload the current page 
+* `Reload Page & Pause`: reload the current page and pause in debugger on script execution in the page body
+* `Go Back`: go to previous address in history
+* `Go Forward`: go to next address in history  
+* `Port: x` :  shows the current port
+  * `Change to: x-1`: allows changing to previous port
+  * `Change to: x+1`: allows changing to next port
+* `Start Debugging`: start debug web-socket server 
+* `Stop Debug Server`: stop debug web-socket server 
+* `Copy Debug Server URL`: copy the debug web-socket URL to clipboard 
+
 ## Available on Maven 
 
 ```xml

@@ -7,37 +7,6 @@
 </style>
 <link rel="stylesheet" href="default-fx.css">
 <link rel="stylesheet" href="github-collapse.css">
-<style>
-.markdown-body,
-.wiki-body {
-    font-family: Arial, "Helvetica Neue", "Segoe UI", freesans, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
-}
-
-code {
-    background-color:#ffe8f8;
-    border-radius:2px;
-    padding:1px 0 0 0;
-    border:1px solid #eec5e1;
-    font-family:Consolas,Inconsolata,Courier,monospace;
-    font-size:0.9em;color:#b00042;
-}
-
-.search-highlight {
-    border: solid 1px #000;
-    padding: 1px;
-    background-color: #ffff00;
-    color: #000;
-}
-
-.selection-highlight {
-    color:#000;
-    padding:1px 0 1px 0;
-    border: solid 1px #52CC7A;
-    background-color: #B5FFCE;
-}
-</style>
 <title>README.md</title>
 </head>
 <body>
@@ -55,16 +24,31 @@ code {
 <p>Here is a teaser screenshot of dev tools running with JavaFX WebView, showing off the console
 logging from scripts, with caller location for one click navigation to source:</p>
 <p><img src="file:///Users/vlad/src/idea-multimarkdown2/JavaFx-WebView-Debugger/images/DevTools.png" alt="DevTools" /></p>
+<h3 id="requirements"><a href="#requirements" name="requirements" class="anchor"><span class="octicon octicon-link"></span></a>Requirements</h3>
+<ul>
+  <li>Java 8 (not tested with 9)</li>
+  <li>The project is on Maven: <code>com.vladsch.javafx-webview-debugger</code></li>
+  <li>dependencies:
+    <ul>
+      <li><code>org.glassfish:javax.json</code></li>
+      <li><code>org.jetbrains.annotations</code></li>
+      <li><code>com.vladsch.boxed-json</code></li>
+      <li><code>org.apache.log4j</code></li>
+    </ul>
+  </li>
+</ul>
 <h3 id="quick-start"><a href="#quick-start" name="quick-start" class="anchor"><span class="octicon octicon-link"></span></a>Quick Start</h3>
+<p>Take a look at the <a href="https://github.com/vsch/WebViewDebugSample">Web View Debug Sample</a> application for a working example. You can play with
+it and debug the embedded scripts before deciding whether you want to instrument your own
+application for Chrome Dev Tools debugging.</p>
 <p>For Maven:</p>
 <pre><code class="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.vladsch.javafx-webview-debugger&lt;/groupId&gt;
     &lt;artifactId&gt;javafx-webview-debugger&lt;/artifactId&gt;
-    &lt;version&gt;LATEST&lt;/version&gt;
+    &lt;version&gt;0.5.6&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
-<p>A WebViewSample application modified for debugging will be added shortly.</p>
-<h4 id="credit-where-credit-is-due"><a href="#credit-where-credit-is-due" name="credit-where-credit-is-due" class="anchor"><span class="octicon octicon-link"></span></a>Credit where credit is due</h4>
+<h3 id="credit-where-credit-is-due"><a href="#credit-where-credit-is-due" name="credit-where-credit-is-due" class="anchor"><span class="octicon octicon-link"></span></a>Credit where credit is due</h3>
 <p>I found out about the possibility of having any debugger for JavaFX WebView in
 <a href="https://github.com/mohamnag/javafx_webview_debugger">mohamnag/javafx_webview_debugger</a>. That implementation in turn was based on the solution found
 by Bosko Popovic.</p>
@@ -87,12 +71,10 @@ initialization debugging to allow pausing of the script before the JSBridge to J
 established. Having a real debugger makes minced meat of script initialization issues.</p>
 <p>The current version is the the code I use in my <a href="http://www.jetbrains.com/idea">IntelliJ IDEA</a> plugin, <a href="http://vladsch.com/product/markdown-navigator">Markdown Navigator</a>.
 With any functionality specific to my project added using the API of this library.</p>
-<p>I will be creating an example project based on Oracle&rsquo;s WebViewSample app with debugging
-implemented. It is easier to create and see a working example than to write a lot of words
-explaining how to do it. This will come later.</p>
-<p>If you are working with JavaFX WebView scripts and need this functionality ASAP, please contact
-me and I will see if we can make this happen sooner than later. Knowing that someone needs this
-will provide a little motivation to getting it done. A little motivation can go a long way.</p>
+<p>If you are working with JavaFX WebView scripts you need this functionality ASAP. Bugs that took
+hours to figure out now take literally seconds to minutes without any recompilation or major log
+reading. Take a look at the <a href="https://github.com/vsch/WebViewDebugSample">Web View Debug Sample</a> application to see what you get and how to
+add it to your code.</p>
 <h4 id="what-is-working"><a href="#what-is-working" name="what-is-working" class="anchor"><span class="octicon octicon-link"></span></a>What is working</h4>
 <ul>
   <li>all <code>console</code> functions: <code>assert</code>, <code>clear</code>, <code>count</code>, <code>debug</code>, <code>dir</code>, <code>dirxml</code>, <code>error</code>,
@@ -154,20 +136,13 @@ updated the page. If the script is responsible for any visual modification of th
 persisted state then the unmodified version will flash on screen before the script is run.</p>
 <p>Allowing scripts to get their state before <code>JSBridge</code> is established makes for smoother page
 refresh.</p>
-<p><strong>The rest of this file is mostly a copy of one in <a href="https://github.com/mohamnag/javafx_webview_debugger">mohamnag/javafx_webview_debugger</a> project</strong>
-with some changes to reflect being able to run multiple debugging sessions on a single server.
-It will be updated in the next few days.</p>
-<p>Using debugger is done in three main steps:</p>
-<ol>
-  <li>Starting debug server</li>
-  <li>Connecting chrome debugger</li>
-  <li>Clean up</li>
-</ol>
-<h3 id="starting-debug-server"><a href="#starting-debug-server" name="starting-debug-server" class="anchor"><span class="octicon octicon-link"></span></a>Starting debug server</h3>
-<p>If you are using Java up to version 8, to enable debugging on a chosen WebView, you have to add
-following code using its <code>webEngine</code>:</p>
-<pre><code class="java">DevToolsDebuggerServer devToolsDebuggerServer(webEngine.impl_getDebugger(), 51742, 1);
-</code></pre>
+<h3 id="getting-full-featured-debugging"><a href="#getting-full-featured-debugging" name="getting-full-featured-debugging" class="anchor"><span class="octicon octicon-link"></span></a>Getting Full Featured Debugging</h3>
+<p>This requires a little support from the Java to JavaScript bridge and the debug proxy. See the
+<a href="https://github.com/vsch/WebViewDebugSample">Web View Debug Sample</a> application for an example.</p>
+<p>I have not tried it with Java 9, and suspect that the debug protocol has changed and the proxy
+may not work with it without modifications.</p>
+<p>However, these are the instructions to compile for Java 9 WebView debugger access as given by
+<a href="https://github.com/mohamnag/javafx_webview_debugger">mohamnag/javafx_webview_debugger</a>.</p>
 <p><code>WebEngine.impl_getDebugger()</code> is an internal API and is subject to change which is happened in
 Java 9. So if you are using Java 9, you need to use following code instead to start the debug
 server:</p>
@@ -197,118 +172,6 @@ DevToolsDebuggerServer devToolsDebuggerServer.startDebugServer(debugger, 51742, 
 </code></pre>
 <p>or for IntelliJ under <strong>Additional command line parameters</strong> in <strong>Preferences &gt; Build,
 Execution, Deployment &gt; Compiler &gt; Java Compiler</strong>.</p>
-<h3 id="connecting-chrome-debugger"><a href="#connecting-chrome-debugger" name="connecting-chrome-debugger" class="anchor"><span class="octicon octicon-link"></span></a>Connecting chrome debugger</h3>
-<p>Then you only need to open following URL in a chrome browser:</p>
-<pre><code class="nohighlight">chrome-devtools://devtools/bundled/inspector.html?ws=localhost:51742/?1
-</code></pre>
-<p>Where 1, 2, 3, &hellip; is the session number you passed to the <code>DevToolsDebuggerServer</code> constructor
-and 51742 is the port passed to the debug server.</p>
-<p><strong>NOTE</strong>: since the web-socket server is a shared static instance, all sessions will have to use
-the same port number.</p>
-<h3 id="clean-up"><a href="#clean-up" name="clean-up" class="anchor"><span class="octicon octicon-link"></span></a>Clean up</h3>
-<p>For a proper shutdown you have to call following when exiting a session or turning off debugging
-for it:</p>
-<pre><code class="java">devToolsDebuggerServer.stopDebugServer();
-</code></pre>
-<p>This will disconnect the JavaFX WebView debugger from its session and this instance of
-<code>DevToolsDebuggerServer</code> will no longer be usable for debugging. To re-start debugging on the
-same session number, create a new instance.</p>
-<p>To shut down the web-socket server after all sessions have been stopped call:</p>
-<pre><code class="java">DevToolsDebuggerServer.shutdownWebSocketServer();
-</code></pre>
-<h2 id="no-library-installation"><a href="#no-library-installation" name="no-library-installation" class="anchor"><span class="octicon octicon-link"></span></a>No Library Installation</h2>
-<p>Code is too small and will most likely need to be customized for your project. Add the two small
-files to your project and modify to your needs. Add <a href="https://github.com/TooTallNate/Java-WebSocket">TooTallNate/Java-WebSocket</a> as a
-dependency.</p>
-<p>These files were pulled from a project after I got it all working nicely. Removed IntelliJ API
-related code and put them here so they can be of use to others.</p>
-<!--
-### Maven
-
-To use maven add this dependency to your pom.xml:
-
-```
-<dependency>
-  <groupId>org.java-websocket</groupId>
-  <artifactId>Java-WebSocket</artifactId>
-  <version>1.3.7</version>
-</dependency>
-```
-
-### Gradle
-
-To use Gradle add the maven central repository to your repositories list :
-
-```
-mavenCentral()
-```
-
-Then you can just add the latest version to your build.
-
-```
-compile "org.java-websocket:Java-WebSocket:1.3.7"
-```
- -->
-<p>JetBrains IntelliJ project files included if you need to reference them, Library is configured
-and downloaded into <code>lib/</code></p>
-<h2 id="enabling-the-console"><a href="#enabling-the-console" name="enabling-the-console" class="anchor"><span class="octicon octicon-link"></span></a>Enabling the console</h2>
-<p>JavaFX WebView does not have a console defined, so console calls inside JavaScript are not
-possible by default. In order to enable JavaScript logging inside JavaFX, a bridge class and a
-separate listener for JavaScript are required.</p>
-<h4 id="bridge-class"><a href="#bridge-class" name="bridge-class" class="anchor"><span class="octicon octicon-link"></span></a>Bridge class</h4>
-<pre><code class="java">public class JavaBridge {
-
-    public void log(String text) {
-        System.out.println(text);
-    }
-
-    public void error(String text) {
-        System.err.println(text);
-    }
-}
-</code></pre>
-<p>It is recommended to use <code>System.out.println</code> for writing to console and avoid any custom
-loggers, as they can cause the entire method to be undefined.</p>
-<h4 id="code-inside-main-class"><a href="#code-inside-main-class" name="code-inside-main-class" class="anchor"><span class="octicon octicon-link"></span></a>Code inside Main class</h4>
-<pre><code class="java">webEngine.setJavaScriptEnabled(true);
-
-webEngine.getLoadWorker().stateProperty().addListener( new ChangeListener&lt;State&gt;() {
-    @Override
-    public void changed(ObservableValue ov, State oldState, State newState) {
-        if (newState == Worker.State.SUCCEEDED) {
-            JSObject window = (JSObject) webEngine.executeScript(&quot;window&quot;);
-            JavaBridge javaBridge = new JavaBridge();
-            window.setMember(&quot;console&quot;, javaBridge); // &quot;console&quot; object is now known to JavaScript
-        }
-    }
-});
-
-</code></pre>
-<p>Note that the name <em>console</em> in <code>window.setMember</code> can be arbitrary, but it is recommended to
-override the console instead because many JavaScript APIs make hidden calls to the console.
-Since the console is undefined by default, JavaScript will most likely stop working after that
-point.</p>
-<h4 id="javascript-example"><a href="#javascript-example" name="javascript-example" class="anchor"><span class="octicon octicon-link"></span></a>JavaScript example</h4>
-<pre><code class="javascript">function initializeMap() {
-
-    var moscowLonLat = \[37.618423, 55.751244\];
-
-    map = new ol.Map({
-        target: 'map',
-        view: new ol.View({
-            center: ol.proj.fromLonLat(moscowLonLat),
-            zoom: 14
-        })
-    });
-    mapLayer = new ol.layer.Tile({
-        source: new ol.source.OSM()
-    });
-
-    map.addLayer(mapLayer);
-
-    console.log(&quot;Map initialized!&quot;); // This will appear in the JavaFX console
-}
-</code></pre>
 </article>
 </div>
 </div>

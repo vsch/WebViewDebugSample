@@ -3,8 +3,13 @@
 [TOC levels=3,6]: # "Version History"
 
 ### Version History
+- [0.5.8](#058)
 - [0.5.6](#056)
 
+
+### 0.5.8
+
+* Add: Reload Page & Pause action
 
 ### 0.5.6
 

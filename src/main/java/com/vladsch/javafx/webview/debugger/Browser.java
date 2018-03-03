@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Worker;
 import javafx.geometry.HPos;
+import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
@@ -36,6 +37,7 @@ class Browser extends Region {
     StringBuilder myMessageBuilder = new StringBuilder();
     int myMessageCount = 0;
     Runnable myOnPageLoadRunnable = null;
+    Runnable myOnConnectionChangeRunnable = null;
 
     /* *****************************************************************************************
      *  Required: JSBridge to handle debugging proxy interface
@@ -43,7 +45,7 @@ class Browser extends Region {
     final DevToolsDebuggerJsBridge myJSBridge;
 
     /* *****************************************************************************************
-     *  Optional state provider to allow persistent state for scripts
+     *  Optional: state provider to allow persistent state for scripts
      *******************************************************************************************/
     final JfxScriptStateProvider myStateProvider;
 
@@ -54,10 +56,27 @@ class Browser extends Region {
         public DevToolsJsBridge(final @NotNull WebView webView, final int instance, @Nullable final JfxScriptStateProvider stateProvider) {
             super(webView, instance, stateProvider);
         }
+
+        // need these to update menu item state
+        @Override
+        public void onConnectionOpen() {
+            addMessage("Chrome Dev Tools connected");
+            if (myOnConnectionChangeRunnable != null) {
+                myOnConnectionChangeRunnable.run();
+            }
+        }
+
+        @Override
+        public void onConnectionClosed() {
+            addMessage("warn", "Chrome Dev Tools disconnected");
+            if (myOnConnectionChangeRunnable != null) {
+                myOnConnectionChangeRunnable.run();
+            }
+        }
     }
 
     /* *****************************************************************************************
-     *  Required to call pageReloading() to inform of upcoming WebView side page reload
+     *  Required: to call JSBridge.pageReloading() to inform of upcoming WebView side page reload
      *******************************************************************************************/
     public void load(final String url) {
         // let it know that we are reloading the page, not chrome dev tools
@@ -67,17 +86,10 @@ class Browser extends Region {
     }
 
     /* *****************************************************************************************
-     *  Required JSBridge connection to JavaScript
-     *  Called on page loading SUCCESS
-     *  does not need to be a separate method, only brought out for illustration purposes
-    *******************************************************************************************/
-    private void connectJSBridge() {
-        myJSBridge.connectJsBridge();
-    }
-
-    /* *****************************************************************************************
-     *  Required: need to add JSBridge helper script in the head to setup missing console for other scripts to use
-     *  Optionally insert persisted JavaScript state information into the page
+     *  Optional: adds JSBridge helper script in the head to setup missing console for
+     *            other scripts to use when a debugger is not connected
+     *
+     *  Optional: insert persisted JavaScript state information into the page
      *******************************************************************************************/
     private String instrumentHtml(String html) {
         // now we add our script if not debugging, because it will be injected
@@ -85,21 +97,39 @@ class Browser extends Region {
             html = html.replace("<head>", "<head>\n<script src=\"markdown-navigator.js\"></script>");
         }
         // inject the state if it exists
-        if (!myStateProvider.getState().isEmpty()) {
+        if (myStateProvider != null && !myStateProvider.getState().isEmpty()) {
             html = html.replace("<body>", "<body>\n<script>\n" + myJSBridge.getStateString() + "\n</script>");
         }
         return html;
     }
 
     /* *****************************************************************************************
-     *  Required: to start/stop debugging connection to this web view instance
+     *  Required: to start debugging connection to this web view instance
      *******************************************************************************************/
-    private void toggleDebugging(Consumer<Throwable> onStartFail, Runnable onStartSuccess, Consumer<Boolean> onStop) {
+    private void startDebugging(Consumer<Throwable> onStartFail, Runnable onStartSuccess) {
+        if (!myJSBridge.isDebuggerEnabled()) {
+            int port = getPort();
+            myJSBridge.startDebugServer(port, onStartFail, onStartSuccess);
+        }
+    }
+
+    /* *****************************************************************************************
+     *  Required: to stop debugging connection to this web view instance
+     *******************************************************************************************/
+    private void stopDebugging(Consumer<Boolean> onStop) {
         if (myJSBridge.isDebuggerEnabled()) {
             myJSBridge.stopDebugServer(onStop);
-        } else {
-            myJSBridge.startDebugServer(getPort(), onStartFail, onStartSuccess);
         }
+    }
+
+    /* *****************************************************************************************
+     *  Required: to establish a JSBridge connection to JavaScript, called on page loading SUCCEEDED
+     *            does not need to be a separate method, only brought out for illustration purposes
+     *            See myWebView.getEngine().getLoadWorker().stateProperty().addListener() in
+     *            the Browser constructor
+     *******************************************************************************************/
+    private void connectJSBridge() {
+        myJSBridge.connectJsBridge();
     }
 
     /* *****************************************************************************************
@@ -108,24 +138,33 @@ class Browser extends Region {
      *  with the debugger. Not dictated by the JavaFX WebView Debugger requirements
      *
      *******************************************************************************************/
-    public BorderPane getRootPane() {
-        return myBorderPane;
-    }
-
     public Browser(JfxScriptStateProvider stateProvider) {
-        locationField = new TextField(Browser.getURL(Browser.getReadmeFile()));
-        locationField.textProperty().bind(myWebView.getEngine().locationProperty());
-        locationField.setOnAction(e -> {
-            load(getUrl(locationField.getText()));
-        });
-
-        myMessageView.setMaxHeight(100);
-        myBorderPane = new BorderPane(this, locationField, null, myMessageView, null);
-
         myStateProvider = stateProvider;
 
         // create JSBridge Instance
         myJSBridge = new DevToolsJsBridge(myWebView, 0, myStateProvider);
+
+        locationField = new TextField(Browser.getURL(Browser.getReadmeFile()));
+        locationField.setOnAction(e -> {
+            load(getUrl(locationField.getText()));
+        });
+
+        //myMessageView.setMaxHeight(100);
+        final SplitPane splitPane = new SplitPane();
+        splitPane.getItems().addAll(this, myMessageView);
+        splitPane.setOrientation(Orientation.VERTICAL);
+        float splitPosition = 0.9f;
+
+        if (myStateProvider != null) {
+            splitPosition = myStateProvider.getState().evalFloat("splitPosition", splitPosition);
+            myStateProvider.getState().put("splitPosition", splitPosition);
+            splitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
+                myStateProvider.getState().put("splitPosition", newValue.floatValue());
+            });
+        }
+        splitPane.setDividerPositions(splitPosition);
+
+        myBorderPane = new BorderPane(splitPane, locationField, null, null, null);
 
         //apply the styles
         getStyleClass().add("browser");
@@ -140,10 +179,20 @@ class Browser extends Region {
         myWebView.getEngine().getLoadWorker().stateProperty().addListener(
                 (ov, oldState, newState) -> {
                     if (newState == Worker.State.SUCCEEDED) {
+                        /* *****************************************************************************************
+                         *  Required: to establish a JSBridge connection to JavaScript, called on page loading SUCCEEDED
+                         *            does not need to be a separate method, only brought out for illustration purposes
+                         *******************************************************************************************/
                         connectJSBridge();
 
-                        // here we can register listeners for events but need to let JS handle theirs without interference
-                        // it seems js event.preventDefault() and .stopImmediatePropagation() don't work on Java registered events
+                        /* *****************************************************************************************
+                         *  Optional: JavaScript event.preventDefault(), event.stopPropagation() and
+                         *            event.stopImmediatePropagation() don't work on Java registered listeners.
+                         *            The alternative mechanism is for JavaScript event handler to set
+                         *            markdownNavigator.setEventHandledBy("IdentifyingTextForDebugging")
+                         *            Then in Java event listener to check for this value not being null,
+                         *            and clear it for next use.
+                         *******************************************************************************************/
                         EventListener clickListener = evt -> {
                             if (myJSBridge.getJSEventHandledBy() != null) {
                                 addMessage("warn", "onClick: default prevented by: " + myJSBridge.getJSEventHandledBy());
@@ -158,6 +207,7 @@ class Browser extends Region {
 
                         Document document = myWebView.getEngine().getDocument();
                         ((EventTarget) document).addEventListener("click", clickListener, false);
+                        locationField.setText(myWebView.getEngine().getLocation());
 
                         if (myOnPageLoadRunnable != null) {
                             myOnPageLoadRunnable.run();
@@ -165,15 +215,14 @@ class Browser extends Region {
                     }
                 });
 
-        myWebView.getEngine().getLocation();
         loadStartPage();
     }
 
-    private void addMessage(String message) {
+    void addMessage(String message) {
         addMessage("log", message);
     }
 
-    private void addMessage(String type, String message) {
+    void addMessage(String type, String message) {
         myMessageCount++;
         String countedMessage = "[" + myMessageCount + "]" + message;
         System.out.println(countedMessage);
@@ -241,6 +290,10 @@ class Browser extends Region {
         });
     }
 
+    public BorderPane getRootPane() {
+        return myBorderPane;
+    }
+
     private String getUrl(String text) {
         if (!text.contains("://")) {
             return "http://" + text;
@@ -295,7 +348,7 @@ class Browser extends Region {
             fontSmoothingTypeProperty.setValue(typeToSet);
         }
 
-        double zoom = myStateProvider.getState().getJsNumber("zoomFactor").doubleValue(1.0);
+        double zoom = getZoomFactor();
         if (myWebView.getZoom() != zoom) {
             myWebView.setZoom(zoom);
         }
@@ -307,20 +360,44 @@ class Browser extends Region {
         goForward.setDisable(history.getCurrentIndex() + 1 >= history.getEntries().size());
     }
 
+    private double getZoomFactor() {
+        return myStateProvider != null ? myStateProvider.getState().getJsNumber("zoomFactor").doubleValue(1.0) : 1.0;
+    }
+
     private boolean isGrayScaleSmoothing() {
-        return myStateProvider.getState().getJsNumber("useGrayScaleSmoothing").isTrue();
+        return myStateProvider != null && myStateProvider.getState().getJsNumber("useGrayScaleSmoothing").isTrue();
     }
 
     private void updatePortMenu(Menu debugPort) {
-        debugPort.setText("Port: " + getPort());
-        debugPort.getItems().get(0).setText("Change to: " + (getPort() - 1));
-        debugPort.getItems().get(1).setText("Change to: " + (getPort() + 1));
+        int port = getPort();
+        debugPort.setText("Port: " + port);
+        debugPort.getItems().get(0).setText("Change to: " + (port - 1));
+        debugPort.getItems().get(1).setText("Change to: " + (port + 1));
     }
 
     private void createContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
-        MenuItem reload = new MenuItem("Reload");
-        reload.setOnAction(e -> myWebView.getEngine().reload());
+        MenuItem reload = new MenuItem("Reload Page");
+        reload.setOnAction(e -> {
+            String location = myWebView.getEngine().getLocation();
+            if (location.replace("file:///", "file:/").equals(getURL(getReadmeFile()))) {
+                // use the url to reload, that way if debugging status changed the page content will be properly updated
+                loadStartPage();
+            } else {
+                myJSBridge.reloadPage(false, false);
+            }
+        });
+
+        MenuItem reloadAndPause = new MenuItem("Reload Page & Pause");
+        reloadAndPause.setOnAction(e -> myJSBridge.reloadPage(true, false));
+
+        // Caution: not for normal script debugging
+        // this one debug breaks before injection code is run, continuing does not properly establish
+        // jsBridge connection, only useful for debugging injected helper code
+        // and to see internal implementation JavaScript commandLineAPI of WebEngine
+        MenuItem reloadAndBreak = new MenuItem("Reload Page & Break");
+        reloadAndBreak.setOnAction(e -> myJSBridge.reloadPage(false, true));
+        reloadAndBreak.setVisible(false);
 
         MenuItem goBack = new MenuItem("Go Back");
         goBack.setOnAction(e -> {
@@ -338,7 +415,7 @@ class Browser extends Region {
             });
         });
 
-        myOnPageLoadRunnable = ()->{
+        myOnPageLoadRunnable = () -> {
             updateHistoryButtons(goBack, goForward);
         };
 
@@ -372,39 +449,52 @@ class Browser extends Region {
             debuggingEnabled.setText("Stop Debug Server");
             copyDebugUrl.setDisable(false);
             debugPort.setDisable(true);
+            reloadAndPause.setDisable(!myJSBridge.isDebugging());
+            reloadAndBreak.setDisable(!myJSBridge.isDebugging());
         };
 
         Runnable updateDebugOff = () -> {
             debuggingEnabled.setText("Start Debug Server");
             copyDebugUrl.setDisable(true);
             debugPort.setDisable(false);
+            reloadAndPause.setDisable(true);
+            reloadAndBreak.setDisable(true);
+        };
+
+        myOnConnectionChangeRunnable = () -> {
+            reloadAndPause.setDisable(!myJSBridge.isDebugging());
+            reloadAndBreak.setDisable(!myJSBridge.isDebugging());
         };
 
         debuggingEnabled.setOnAction(e -> {
-            toggleDebugging((ex) -> {
-                // failed to start
-                addMessage("error", "Debug server failed to start: " + ex.getMessage());
-                updateDebugOff.run();
-            }, () -> {
-                addMessage("Debug server started, debug URL: " + myJSBridge.getDebuggerURL());
-                // can copy debug URL to clipboard
-                updateDebugOn.run();
-            }, value -> {
-                // true - stopped and shutdown
-                // false - stopped and still running for other instances
-                // null - was not connected so don't know
-                if (value == null) {
-                    addMessage("Debug server stopped");
-                } else if (value) {
-                    addMessage("Debug server shutdown");
-                } else {
-                    addMessage("Debug server connection closed");
-                }
-                updateDebugOff.run();
-            });
+            if (myJSBridge.isDebuggerEnabled()) {
+                stopDebugging(value -> {
+                    // true - stopped and shutdown
+                    // false - stopped and still running for other instances
+                    // null - was not connected so don't know
+                    if (value == null) {
+                        addMessage("Debug server stopped");
+                    } else if (value) {
+                        addMessage("Debug server shutdown");
+                    } else {
+                        addMessage("Debug server connection closed");
+                    }
+                    updateDebugOff.run();
+                });
+            } else {
+                startDebugging((ex) -> {
+                    // failed to start
+                    addMessage("error", "Debug server failed to start: " + ex.getMessage());
+                    updateDebugOff.run();
+                }, () -> {
+                    addMessage("Debug server started, debug URL: " + myJSBridge.getDebuggerURL());
+                    // can copy debug URL to clipboard
+                    updateDebugOn.run();
+                });
+            }
         });
 
-        contextMenu.getItems().addAll(reload, goBack, goForward, debugPort, debuggingEnabled, copyDebugUrl);
+        contextMenu.getItems().addAll(reload, reloadAndPause, reloadAndBreak, goBack, goForward, debugPort, debuggingEnabled, copyDebugUrl);
 
         myWebView.setOnMousePressed(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
@@ -413,13 +503,17 @@ class Browser extends Region {
                 contextMenu.hide();
             }
         });
+
+        updateDebugOff.run();
     }
 
     private int getPort() {
+        assert myStateProvider != null;
         return myStateProvider.getState().getJsNumber("debugPort").intValue(51723);
     }
 
     private void setPort(int port) {
+        assert myStateProvider != null;
         myStateProvider.getState().put("debugPort", port);
     }
 
