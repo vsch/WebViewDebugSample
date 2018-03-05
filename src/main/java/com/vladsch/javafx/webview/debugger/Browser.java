@@ -1,5 +1,6 @@
 package com.vladsch.javafx.webview.debugger;
 
+import com.sun.javafx.webkit.WebConsoleListener;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Worker;
@@ -414,6 +415,12 @@ class Browser extends Region {
                 history.go(1);
             });
         });
+
+/*
+        WebConsoleListener.setDefaultListener((webView, message, lineNumber, sourceId) -> {
+            System.out.println(message + "[at " + lineNumber + "]");
+        });
+*/
 
         myOnPageLoadRunnable = () -> {
             updateHistoryButtons(goBack, goForward);
