@@ -38,30 +38,30 @@ Using the context menu on the main page:
 
 ### Context Menu Actions
 
-* `Reload Pag `: reload the current page 
+* `Reload Pag `: reload the current page
 * `Reload Page & Pause`: reload the current page and pause in debugger on script execution in the page body
 * `Go Back`: go to previous address in history
-* `Go Forward`: go to next address in history  
+* `Go Forward`: go to next address in history
 * `Port: x` :  shows the current port
   * `Change to: x-1`: allows changing to previous port
   * `Change to: x+1`: allows changing to next port
-* `Start Debugging`: start debug web-socket server 
-* `Stop Debug Server`: stop debug web-socket server 
-* `Copy Debug Server URL`: copy the debug web-socket URL to clipboard 
+* `Start Debugging`: start debug web-socket server
+* `Stop Debug Server`: stop debug web-socket server
+* `Copy Debug Server URL`: copy the debug web-socket URL to clipboard
 
-## Available on Maven 
+## Available on Maven
 
 ```xml
 <dependency>
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>webview-debug-sample</artifactId>
-    <version>0.5.6</version>
+    <version>0.5.12</version>
 </dependency>
 ```
 
 [Javafx Web View Debugger Readme]: https://github.com/vsch/Javafx-WebView-Debugger/blob/master/README.md
 [Web View Debug Sample]: https://github.com/vsch/WebViewDebugSample
 [JavaFx WebView Debugger]: https://github.com/vsch/Javafx-WebView-Debugger
-[Markdown Navigator]: http://vladsch.com/product/markdown-navigator 
+[Markdown Navigator]: http://vladsch.com/product/markdown-navigator
 [WebViewDebugSample.jar]: https://github.com/vsch/WebViewDebugSample/raw/master/WebViewDebugSample.jar
 
