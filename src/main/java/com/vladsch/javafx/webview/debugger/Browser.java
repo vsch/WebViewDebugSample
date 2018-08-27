@@ -1,6 +1,5 @@
 package com.vladsch.javafx.webview.debugger;
 
-import com.sun.javafx.webkit.WebConsoleListener;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Worker;
@@ -55,7 +54,7 @@ class Browser extends Region {
      *******************************************************************************************/
     public class DevToolsJsBridge extends DevToolsDebuggerJsBridge {
         public DevToolsJsBridge(final @NotNull WebView webView, final int instance, @Nullable final JfxScriptStateProvider stateProvider) {
-            super(webView, instance, stateProvider);
+            super(webView, webView.getEngine().impl_getDebugger(), instance, stateProvider);
         }
 
         // need these to update menu item state
