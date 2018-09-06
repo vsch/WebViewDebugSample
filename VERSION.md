@@ -3,12 +3,17 @@
 [TOC levels=3,6]: # "Version History"
 
 ### Version History
+- [0.6.2](#062)
 - [0.6.0](#060)
 - [0.5.12](#0512)
 - [0.5.10](#0510)
 - [0.5.8](#058)
 - [0.5.6](#056)
 
+
+### 0.6.2
+
+* Update to 0.6.2 JavaFx-WebView-Debugger
 
 ### 0.6.0
 
