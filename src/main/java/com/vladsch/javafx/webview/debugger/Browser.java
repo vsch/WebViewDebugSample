@@ -281,9 +281,10 @@ class Browser extends Region {
 
                 myMessageView.getEngine().load(getURL(messageFile));
 
-                if (myJSBridge.isDebugging()) {
-                    myWebView.getEngine().executeScript(String.format("console.%s(\"%s\");", type, message));
-                }
+                // cannot use script console.log until page is loaded, otherwise will mess up state machine for log handling
+                //if (myJSBridge.isDebugging()) {
+                //    myWebView.getEngine().executeScript(String.format("console.%s(\"%s\");", type, message));
+                //}
             } catch (Exception ignored) {
 
             }

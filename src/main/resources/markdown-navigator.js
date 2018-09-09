@@ -34,7 +34,7 @@ var debugBreak = () => {
 
 // lets keep this around for our scripts
 // noinspection ES6ConvertVarToLetConst
-var __api = console.__commandLineAPI;
+var __api = console.__commandLineAPI || {};
 
 // map console functions to our bridge
 // noinspection ES6ConvertVarToLetConst
@@ -50,27 +50,27 @@ var console = (() => {
     };
 
     return {
-        assert: () => __tmp.consoleLog("assert", arguments),
-        clear: () => __tmp.consoleLog("clear", arguments),
-        count: () => __tmp.consoleLog("count", arguments),
-        debug: () => __tmp.consoleLog("debug", arguments),
-        dir: () => __tmp.consoleLog("dir", arguments),
-        dirxml: () => __tmp.consoleLog("dirxml", arguments),
-        error: () => __tmp.consoleLog("error", arguments),
-        exception: () => __tmp.consoleLog("exception", arguments),
-        group: () => __tmp.consoleLog("startGroup", arguments),
-        groupCollapsed: () => __tmp.consoleLog("startGroupCollapsed", arguments),
-        groupEnd: () => __tmp.consoleLog("endGroup", arguments),
-        info: () => __tmp.consoleLog("info", arguments),
-        log: () => __tmp.consoleLog("log", arguments),
-        profile: () => __tmp.consoleLog("profile", arguments),
-        profileEnd: () => __tmp.consoleLog("profileEnd", arguments),
-        select: () => __tmp.consoleLog("select", arguments),
-        table: () => __tmp.consoleLog("table", arguments),
-        time: () => __tmp.consoleLog("time", arguments),
-        timeEnd: () => __tmp.consoleLog("timeEnd", arguments),
-        trace: () => __tmp.consoleLog("trace", arguments),
-        warn: () => __tmp.consoleLog("warning", arguments),
+        assert: function () { return __tmp.consoleLog("assert", arguments); },
+        clear: function () { return __tmp.consoleLog("clear", arguments); },
+        count: function () { return __tmp.consoleLog("count", arguments); },
+        debug: function () { return __tmp.consoleLog("debug", arguments); },
+        dir: function () { return __tmp.consoleLog("dir", arguments); },
+        dirxml: function () { return __tmp.consoleLog("dirxml", arguments); },
+        error: function () { return __tmp.consoleLog("error", arguments); },
+        exception: function () { return __tmp.consoleLog("exception", arguments); },
+        group: function () { return __tmp.consoleLog("startGroup", arguments); },
+        groupCollapsed: function () { return __tmp.consoleLog("startGroupCollapsed", arguments); },
+        groupEnd: function () { return __tmp.consoleLog("endGroup", arguments); },
+        info: function () { return __tmp.consoleLog("info", arguments); },
+        log: function () { return __tmp.consoleLog("log", arguments); },
+        profile: function () { return __tmp.consoleLog("profile", arguments); },
+        profileEnd: function () { return __tmp.consoleLog("profileEnd", arguments); },
+        select: function () { return __tmp.consoleLog("select", arguments); },
+        table: function () { return __tmp.consoleLog("table", arguments); },
+        time: function () { return __tmp.consoleLog("time", arguments); },
+        timeEnd: function () { return __tmp.consoleLog("timeEnd", arguments); },
+        trace: function () { return __tmp.consoleLog("trace", arguments); },
+        warn: function () { return __tmp.consoleLog("warning", arguments); },
         print: text => __tmp.print(text),
         println: text => __tmp.println(text),
         setJsBridge: (jsBridge) => {
@@ -95,9 +95,8 @@ markdownNavigator = (function () {
     const HIGHLIGHT_STYLE = document.createElement("style");
 
     // just so we get a color chooser in IDEA, uncomment
-    // const dummy = "<style>.${HIGHLIGHT} { background-color: #2000c0; }</style>";
     HIGHLIGHT_STYLE.textContent = `.${HIGHLIGHT} {
-    background-color: rgba(64, 0, 192, 0.2) !important;
+    background-color: rgba(255, 0, 255, 0.07) !important;
 }`;
 
     let __markdownNavigator,
@@ -264,8 +263,6 @@ markdownNavigator = (function () {
                     console.println("onJsConsole exception: " + e);
                 }
             }
-
-            console.groupCollapsed("markdownNavigator:OnLoad");
 
             // save any state changes requested before jsBridge was setup
             console.groupCollapsed("cachedState");
