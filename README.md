@@ -24,15 +24,19 @@ Using the context menu on the main page:
 
    ![Context Menu Start](assets/images/context-menu-start.png),
 
-2. Click on the `Copy Debug Server URL`
+2. On some Java you need to use the context menu to reload the page before connecting Chrome Dev
+   Tools. (If you got an application crash after connecting Google Chrome tools without doing
+   this step, then chances are good that this step is needed.)
+
+3. Click on the `Copy Debug Server URL`
 
    ![context-menu-copy](assets/images/context-menu-copy.png)
 
-3. open Google Chrome, paste the URL in its address bar and hit ENTER.
+4. open Google Chrome, paste the URL in its address bar and hit ENTER.
 
-4. Hit **⌘R** on OS X or **Ctrl+F5** on Windows/Linux to reload the page being debugged.
+5. Hit **⌘R** on OS X or **Ctrl+F5** on Windows/Linux to reload the page being debugged.
 
-5. Enjoy full featured debugging of JavaFX WebView!
+6. Enjoy full featured debugging of JavaFX WebView!
 
 ![main-screen](https://raw.githubusercontent.com/vsch/WebViewDebugSample/master/assets/images/main-screen.png)
 
@@ -55,7 +59,7 @@ Using the context menu on the main page:
 <dependency>
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>webview-debug-sample</artifactId>
-    <version>0.6.2</version>
+    <version>0.6.4</version>
 </dependency>
 ```
 

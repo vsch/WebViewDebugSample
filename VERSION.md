@@ -3,6 +3,7 @@
 [TOC levels=3,6]: # "Version History"
 
 ### Version History
+- [0.6.4](#064)
 - [0.6.2](#062)
 - [0.6.0](#060)
 - [0.5.12](#0512)
@@ -10,6 +11,11 @@
 - [0.5.8](#058)
 - [0.5.6](#056)
 
+
+### 0.6.4
+
+* Update to 0.6.4 JavaFx-WebView-Debugger
+* Fix: remove trying to use JS `console.log` before page is loaded. Messes up logging
 
 ### 0.6.2
 
