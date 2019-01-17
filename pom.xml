@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>webview-debug-sample</artifactId>
-    <version>0.6.4</version>
+    <version>0.6.10</version>
     <name>WebViewDebugSample</name>
     <description>
         Sample Application with full function debugging implementation for JavaFX WebView using Chrome Dev Tools via web-socket server
@@ -14,7 +14,7 @@
         <dependency>
             <groupId>com.vladsch.javafx-webview-debugger</groupId>
             <artifactId>javafx-webview-debugger</artifactId>
-            <version>0.6.4</version>
+            <version>0.6.10</version>
         </dependency>
     </dependencies>
 
@@ -87,7 +87,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.7.0</version>
                 <configuration>
                     <source>8</source>
                     <target>8</target>
@@ -95,7 +95,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.1</version>
+                <version>2.8.2</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
@@ -115,7 +115,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>2.10.4</version>
                 <executions>
                     <execution>
                         <id>package-javadoc</id>

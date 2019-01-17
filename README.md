@@ -59,7 +59,7 @@ Using the context menu on the main page:
 <dependency>
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>webview-debug-sample</artifactId>
-    <version>0.6.4</version>
+    <version>0.6.10</version>
 </dependency>
 ```
 
