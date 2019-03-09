@@ -4,7 +4,7 @@ WebView Sample application with full featured Chrome Dev Tools debugging using
 [JavaFx WebView Debugger] library.
 
 [![Build status](https://travis-ci.org/vsch/WebViewDebugSample.svg?branch=master)](https://travis-ci.org/vsch/WebViewDebugSample)
-[![Maven Central status](https://img.shields.io/maven-central/v/com.vladsch.javafx-webview-debugger/webview-debug-sample.svg)](https://search.maven.org/search?q=g:com.vladsch.javafx-webview-debugger)
+[![Maven Central status](https://img.shields.io/maven-central/v/com.vladsch.javafx-webview-debugger/webview-debug-sample.svg)](https://search.maven.org/search?q=g:com.vladsch.javafx-webview-debugger)<!-- @IGNORE PREVIOUS: link -->
 
 To try it out download the [WebViewDebugSample.jar] to an empty directory. The application will
 create `public` directory for its HTML page and resources and save a JSON file of script state

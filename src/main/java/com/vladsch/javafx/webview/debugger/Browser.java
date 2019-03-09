@@ -54,7 +54,7 @@ class Browser extends Region {
      *******************************************************************************************/
     public class DevToolsJsBridge extends DevToolsDebuggerJsBridge {
         public DevToolsJsBridge(final @NotNull WebView webView, final int instance, @Nullable final JfxScriptStateProvider stateProvider) {
-            super(webView, webView.getEngine().impl_getDebugger(), instance, stateProvider);
+            super(webView, webView.getEngine(), instance, stateProvider);
         }
 
         // need these to update menu item state
