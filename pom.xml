@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>webview-debug-sample</artifactId>
-    <version>0.7.4</version>
+    <version>0.7.6</version>
     <name>WebViewDebugSample</name>
     <description>
         Sample Application with full function debugging implementation for JavaFX WebView using Chrome Dev Tools via web-socket server
@@ -14,7 +14,7 @@
         <dependency>
             <groupId>com.vladsch.javafx-webview-debugger</groupId>
             <artifactId>javafx-webview-debugger</artifactId>
-            <version>0.7.4</version>
+            <version>0.7.6</version>
         </dependency>
     </dependencies>
 
