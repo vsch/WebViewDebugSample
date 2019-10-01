@@ -70,7 +70,7 @@ public class WebViewDebugSample extends Application implements JfxScriptStatePro
             if (stateFile.exists()) {
                 // read in the previous state
                 FileReader stateReader = new FileReader(stateFile);
-                ourJsState = BoxedJson.from(stateReader);
+                ourJsState = BoxedJson.boxedFrom(stateReader);
                 stateReader.close();
             }
         } catch (IOException e) {
