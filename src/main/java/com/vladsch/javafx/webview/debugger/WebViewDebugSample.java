@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -82,9 +83,64 @@ public class WebViewDebugSample extends Application implements JfxScriptStatePro
         }
     }
 
+    static final Logger LOG = Logger.getLogger("com.vladsch.javafx.webview.debugger");
+
     public static void main(String[] args) {
         //Platform.setImplicitExit(false);
         File publicDir = new File("public");
+
+        LogHandler.LOG_HANDLER = new LogHandler() {
+            @Override
+            public void trace(@NotNull String message) { LOG.trace(message); }
+
+            @Override
+            public void trace(@NotNull String message, @NotNull Throwable t) { LOG.trace(message, t); }
+
+            @Override
+            public void trace(@NotNull Throwable t) { LOG.trace(t); }
+
+            @Override
+            public boolean isTraceEnabled() {return LOG.isTraceEnabled(); }
+
+            @Override
+            public void debug(@NotNull String message) { LOG.debug(message); }
+
+            @Override
+            public void debug(@NotNull String message, @NotNull Throwable t) { LOG.debug(message, t); }
+
+            @Override
+            public void debug(@NotNull Throwable t) { LOG.debug(t); }
+
+            @Override
+            public void error(@NotNull String message) { LOG.error(message); }
+
+            @Override
+            public void error(@NotNull String message, @NotNull Throwable t) { LOG.error(message, t); }
+
+            @Override
+            public void error(@NotNull Throwable t) { LOG.error(t); }
+
+            @Override
+            public void info(@NotNull String message) { LOG.info(message); }
+
+            @Override
+            public void info(@NotNull String message, @NotNull Throwable t) { LOG.info(message, t); }
+
+            @Override
+            public void info(@NotNull Throwable t) { LOG.info(t); }
+
+            @Override
+            public boolean isDebugEnabled() {return LOG.isDebugEnabled(); }
+
+            @Override
+            public void warn(@NotNull String message) { LOG.warn(message); }
+
+            @Override
+            public void warn(@NotNull String message, @NotNull Throwable t) { LOG.warn(message, t); }
+
+            @Override
+            public void warn(@NotNull Throwable t) { LOG.warn(t); }
+        };
 
         if (!publicDir.exists()) {
             publicDir.mkdir();
